@@ -3,7 +3,7 @@ name: centos8
 on:
   pull_request:
     branches:
-      - textualitty
+      - main
     paths-ignore:
       - ".cirrus.yml"
       - "docs/*"

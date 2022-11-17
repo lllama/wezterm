@@ -3,7 +3,7 @@ name: termwiz
 on:
   pull_request:
     branches:
-      - textualitty
+      - main
     paths-ignore:
       - ".cirrus.yml"
       - "docs/*"
@@ -16,7 +16,7 @@ on:
       - "**/*.md"
   push:
     branches:
-      - textualitty
+      - main
     paths-ignore:
       - ".cirrus.yml"
       - "docs/**"
