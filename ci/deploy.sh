@@ -19,34 +19,34 @@ fi
 
 case $OSTYPE in
   darwin*)
-    zipdir=WezTerm-macos-$TAG_NAME
+    zipdir=Textualitty-macos-$TAG_NAME
     if [[ "$BUILD_REASON" == "Schedule" ]] ; then
-      zipname=WezTerm-macos-nightly.zip
+      zipname=Textualitty-macos-nightly.zip
     else
       zipname=$zipdir.zip
     fi
     rm -rf $zipdir $zipname
     mkdir $zipdir
-    cp -r assets/macos/WezTerm.app $zipdir/
+    cp -r assets/macos/Textualitty.app $zipdir/
     # Omit MetalANGLE for now; it's a bit laggy compared to CGL,
     # and on M1/Big Sur, CGL is implemented in terms of Metal anyway
-    rm $zipdir/WezTerm.app/*.dylib
-    mkdir -p $zipdir/WezTerm.app/Contents/MacOS
-    mkdir -p $zipdir/WezTerm.app/Contents/Resources
-    cp -r assets/shell-integration/* $zipdir/WezTerm.app/Contents/Resources
+    rm $zipdir/Textualitty.app/*.dylib
+    mkdir -p $zipdir/Textualitty.app/Contents/MacOS
+    mkdir -p $zipdir/Textualitty.app/Contents/Resources
+    cp -r assets/shell-integration/* $zipdir/Textualitty.app/Contents/Resources
 
     for bin in wezterm wezterm-mux-server wezterm-gui strip-ansi-escapes ; do
       # If the user ran a simple `cargo build --release`, then we want to allow
       # a single-arch package to be built
       if [[ -f target/release/$bin ]] ; then
-        cp target/release/$bin $zipdir/WezTerm.app/Contents/MacOS/$bin
+        cp target/release/$bin $zipdir/Textualitty.app/Contents/MacOS/$bin
       else
         # The CI runs `cargo build --target XXX --release` which means that
         # the binaries will be deployed in `target/XXX/release` instead of
         # the plain path above.
         # In that situation, we have two architectures to assemble into a
         # Universal ("fat") binary, so we use the `lipo` tool for that.
-        lipo target/*/release/$bin -output $zipdir/WezTerm.app/Contents/MacOS/$bin -create
+        lipo target/*/release/$bin -output $zipdir/Textualitty.app/Contents/MacOS/$bin -create
       fi
     done
 
@@ -77,7 +77,7 @@ case $OSTYPE in
       security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_PW" build.keychain
       echo "Codesign"
       /usr/bin/codesign --keychain build.keychain --force --options runtime \
-        --entitlements ci/macos-entitlement.plist --deep --sign "$MACOS_TEAM_ID" $zipdir/WezTerm.app/
+        --entitlements ci/macos-entitlement.plist --deep --sign "$MACOS_TEAM_ID" $zipdir/Textualitty.app/
       echo "Restore default keychain"
       security default-keychain -d user -s $def_keychain
       echo "Remove build.keychain"
@@ -99,13 +99,13 @@ case $OSTYPE in
 
     ;;
   msys)
-    zipdir=WezTerm-windows-$TAG_NAME
+    zipdir=Textualitty-windows-$TAG_NAME
     if [[ "$BUILD_REASON" == "Schedule" ]] ; then
-      zipname=WezTerm-windows-nightly.zip
-      instname=WezTerm-nightly-setup
+      zipname=Textualitty-windows-nightly.zip
+      instname=Textualitty-nightly-setup
     else
       zipname=$zipdir.zip
-      instname=WezTerm-${TAG_NAME}-setup
+      instname=Textualitty-${TAG_NAME}-setup
     fi
     rm -rf $zipdir $zipname
     mkdir $zipdir

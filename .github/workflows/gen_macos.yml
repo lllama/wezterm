@@ -1,7 +1,7 @@
 name: macos
 
 on:
-  pull_request:
+  push:
     branches:
       - textualitty
     paths-ignore:
