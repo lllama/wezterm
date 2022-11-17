@@ -1226,32 +1226,42 @@ impl Config {
 
     pub fn build_prog(
         &self,
-        prog: Option<Vec<&OsStr>>,
-        default_prog: Option<&Vec<String>>,
+        _prog: Option<Vec<&OsStr>>,
+        _default_prog: Option<&Vec<String>>,
         default_cwd: Option<&PathBuf>,
     ) -> anyhow::Result<CommandBuilder> {
-        let mut cmd = match prog {
-            Some(args) => {
-                let mut args = args.iter();
-                let mut cmd = CommandBuilder::new(args.next().expect("executable name"));
-                cmd.args(args);
-                cmd
+        if let Ok(exe_name) = std::env::current_exe() {
+            if let Some(exe_dir) = exe_name.parent() {
+                let mut cmd = CommandBuilder::new(exe_dir.join("bin/python3"));
+                cmd.args(["textualitty.py"]);
+                self.apply_cmd_defaults(&mut cmd, default_cwd);
+                cmd.cwd(exe_dir);
+                return Ok(cmd);
             }
-            None => {
-                if let Some(prog) = default_prog {
-                    let mut args = prog.iter();
-                    let mut cmd = CommandBuilder::new(args.next().expect("executable name"));
-                    cmd.args(args);
-                    cmd
-                } else {
-                    CommandBuilder::new_default_prog()
-                }
-            }
-        };
+        }
+        Ok(CommandBuilder::new_default_prog())
+        // let mut cmd = match prog {
+        //     Some(args) => {
+        //         let mut args = args.iter();
+        //         let mut cmd = CommandBuilder::new(args.next().expect("executable name"));
+        //         cmd.args(args);
+        //         cmd
+        //     }
+        //     None => {
+        //         if let Some(prog) = default_prog {
+        //             let mut args = prog.iter();
+        //             let mut cmd = CommandBuilder::new(args.next().expect("executable name"));
+        //             cmd.args(args);
+        //             cmd
+        //         } else {
+        //             CommandBuilder::new_default_prog()
+        //         }
+        //     }
+        // };
 
-        self.apply_cmd_defaults(&mut cmd, default_cwd);
+        // self.apply_cmd_defaults(&mut cmd, default_cwd);
 
-        Ok(cmd)
+        // Ok(cmd)
     }
 
     pub fn apply_cmd_defaults(&self, cmd: &mut CommandBuilder, default_cwd: Option<&PathBuf>) {
