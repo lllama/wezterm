@@ -3,7 +3,7 @@ name: fedora35
 on:
   pull_request:
     branches:
-      - main
+      - textualitty
     paths-ignore:
       - ".cirrus.yml"
       - "docs/*"

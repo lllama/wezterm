@@ -3,7 +3,7 @@ name: wezterm-ssh
 on:
   pull_request:
     branches:
-      - main
+      - textualitty
     paths-ignore:
       - ".cirrus.yml"
       - "docs/*"
@@ -17,7 +17,7 @@ on:
       - "**/*.md"
   push:
     branches:
-      - main
+      - textualitty
     paths-ignore:
       - ".cirrus.yml"
       - "docs/**"

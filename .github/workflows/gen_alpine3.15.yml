@@ -3,7 +3,7 @@ name: alpine3.15
 on:
   pull_request:
     branches:
-      - main
+      - textualitty
     paths-ignore:
       - ".cirrus.yml"
       - "docs/*"

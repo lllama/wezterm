@@ -3,7 +3,7 @@ name: ubuntu18
 on:
   pull_request:
     branches:
-      - main
+      - textualitty
     paths-ignore:
       - ".cirrus.yml"
       - "docs/*"

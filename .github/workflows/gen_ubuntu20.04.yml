@@ -3,7 +3,7 @@ name: ubuntu20.04
 on:
   pull_request:
     branches:
-      - main
+      - textualitty
     paths-ignore:
       - ".cirrus.yml"
       - "docs/*"

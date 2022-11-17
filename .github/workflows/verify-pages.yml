@@ -3,7 +3,7 @@ name: pages
 on:
   pull_request:
     branches:
-      - main
+      - textualitty
     paths:
       - "docs/**"
       - "ci/build-docs.sh"
