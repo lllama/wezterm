@@ -50,9 +50,9 @@ jobs:
       - name: "Build (Release mode ARM)"
         shell: bash
         run: "cargo build --target aarch64-apple-darwin --all --release"
-      - name: "Test (Release mode)"
-        shell: bash
-        run: "cargo test --target x86_64-apple-darwin --all --release"
+      # - name: "Test (Release mode)"
+      #   shell: bash
+      #   run: "cargo test --target x86_64-apple-darwin --all --release"
       - name: "Package"
         shell: bash
         run: "bash ci/deploy.sh"
