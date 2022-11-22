@@ -756,19 +756,17 @@ impl Config {
             PathPossibility::optional(CONFIG_DIR.join("wezterm.lua")),
             PathPossibility::optional(HOME_DIR.join(".wezterm.lua")),
         ];
-        if cfg!(windows) {
-            // On Windows, a common use case is to maintain a thumb drive
-            // with a set of portable tools that don't need to be installed
-            // to run on a target system.  In that scenario, the user would
-            // like to run with the config from their thumbdrive because
-            // either the target system won't have any config, or will have
-            // the config of another user.
-            // So we prioritize that here: if there is a config in the same
-            // dir as the executable that will take precedence.
-            if let Ok(exe_name) = std::env::current_exe() {
-                if let Some(exe_dir) = exe_name.parent() {
-                    paths.insert(0, PathPossibility::optional(exe_dir.join("wezterm.lua")));
-                }
+        // On Windows, a common use case is to maintain a thumb drive
+        // with a set of portable tools that don't need to be installed
+        // to run on a target system.  In that scenario, the user would
+        // like to run with the config from their thumbdrive because
+        // either the target system won't have any config, or will have
+        // the config of another user.
+        // So we prioritize that here: if there is a config in the same
+        // dir as the executable that will take precedence.
+        if let Ok(exe_name) = std::env::current_exe() {
+            if let Some(exe_dir) = exe_name.parent() {
+                paths.insert(0, PathPossibility::optional(exe_dir.join("wezterm.lua")));
             }
         }
         if let Some(path) = std::env::var_os("WEZTERM_CONFIG_FILE") {
@@ -1126,12 +1124,10 @@ impl Config {
     fn compute_color_scheme_dirs(&self) -> Vec<PathBuf> {
         let mut paths = self.color_scheme_dirs.clone();
         paths.push(CONFIG_DIR.join("colors"));
-        if cfg!(windows) {
-            // See commentary re: portable tools above!
-            if let Ok(exe_name) = std::env::current_exe() {
-                if let Some(exe_dir) = exe_name.parent() {
-                    paths.insert(0, exe_dir.join("colors"));
-                }
+        // See commentary re: portable tools above!
+        if let Ok(exe_name) = std::env::current_exe() {
+            if let Some(exe_dir) = exe_name.parent() {
+                paths.insert(0, exe_dir.join("colors"));
             }
         }
         paths
@@ -1226,42 +1222,32 @@ impl Config {
 
     pub fn build_prog(
         &self,
-        _prog: Option<Vec<&OsStr>>,
-        _default_prog: Option<&Vec<String>>,
+        prog: Option<Vec<&OsStr>>,
+        default_prog: Option<&Vec<String>>,
         default_cwd: Option<&PathBuf>,
     ) -> anyhow::Result<CommandBuilder> {
-        if let Ok(exe_name) = std::env::current_exe() {
-            if let Some(exe_dir) = exe_name.parent() {
-                let mut cmd = CommandBuilder::new(exe_dir.join("bin/python3"));
-                cmd.args(["textualitty.py"]);
-                self.apply_cmd_defaults(&mut cmd, default_cwd);
-                cmd.cwd(exe_dir);
-                return Ok(cmd);
+        let mut cmd = match prog {
+            Some(args) => {
+                let mut args = args.iter();
+                let mut cmd = CommandBuilder::new(args.next().expect("executable name"));
+                cmd.args(args);
+                cmd
             }
-        }
-        Ok(CommandBuilder::new_default_prog())
-        // let mut cmd = match prog {
-        //     Some(args) => {
-        //         let mut args = args.iter();
-        //         let mut cmd = CommandBuilder::new(args.next().expect("executable name"));
-        //         cmd.args(args);
-        //         cmd
-        //     }
-        //     None => {
-        //         if let Some(prog) = default_prog {
-        //             let mut args = prog.iter();
-        //             let mut cmd = CommandBuilder::new(args.next().expect("executable name"));
-        //             cmd.args(args);
-        //             cmd
-        //         } else {
-        //             CommandBuilder::new_default_prog()
-        //         }
-        //     }
-        // };
+            None => {
+                if let Some(prog) = default_prog {
+                    let mut args = prog.iter();
+                    let mut cmd = CommandBuilder::new(args.next().expect("executable name"));
+                    cmd.args(args);
+                    cmd
+                } else {
+                    CommandBuilder::new_default_prog()
+                }
+            }
+        };
 
-        // self.apply_cmd_defaults(&mut cmd, default_cwd);
+        self.apply_cmd_defaults(&mut cmd, default_cwd);
 
-        // Ok(cmd)
+        Ok(cmd)
     }
 
     pub fn apply_cmd_defaults(&self, cmd: &mut CommandBuilder, default_cwd: Option<&PathBuf>) {
